@@ -24,7 +24,7 @@ echo "Payload:\norder={$order}\n";
 
 
 // Auto-fetch
-$target = 'http://localhost:8080/';
+$target = 'http://2.vulnerable.local';
 
 // Exploit the application
 $curl = curl_init();
